@@ -74,12 +74,16 @@ class WebSocketApp {
       this.websocket.close();
       document.dispatchEvent(new CustomEvent("result", {detail: data['secretCode']}));
     }
+
+    if(data['error']) {
+      document.dispatchEvent(new CustomEvent("error", { detail: JSON.stringify(data) }));
+    }
   }
 
   _performArithmetic(data) {
     const sign = data['sign'];
     const result = data['values'].reduce((acc, val) => eval(`${acc} ${sign} ${val}`));
-    this.websocket.send(JSON.stringify({ "token": this.message.authToken, "command": "arithmetic", "answer": result }));
+    this.websocket.send(JSON.stringify({ "token": this.message.authToken, "command": this.message.command, "answer": result }));
   }
 
   _processBinaryData(buffer) {
@@ -91,7 +95,7 @@ class WebSocketApp {
     }
 
     const result = ul.reduce((acc, val) => acc + val);
-    this.websocket.send(JSON.stringify({ "token": this.message.authToken, "command": "binary_arithmetic", "answer": result }));
+    this.websocket.send(JSON.stringify({ "token": this.message.authToken, "command": this.message.command, "answer": result }));
   }
 }
 
