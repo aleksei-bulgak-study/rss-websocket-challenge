@@ -1,0 +1,30 @@
+{
+  "name": "websocket",
+  "version": "1.0.0",
+  "description": "websocket stab",
+  "main": "./src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode development --watch",
+    "lint": "eslint src/"
+  },
+  "keywords": [
+    "websocket",
+    "rss"
+  ],
+  "author": "Aleksei Bulgak",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.1.6",
+    "@webpack-cli/init": "^0.1.2",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.4",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-import": "^2.14.0",
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.1.2"
+  }
+}
