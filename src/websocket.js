@@ -23,6 +23,12 @@ class WebSocketApp {
     }
   }
 
+  stop() {
+    if (this.websocket.readyState !== this.websocket.CLOSED) {
+      this.websocket.close();
+    }
+  }
+
   _ready() {
     this.connected = true;
   }
@@ -66,6 +72,7 @@ class WebSocketApp {
     if (data['secretCode']) {
       console.log(`WIN: ${data['secretCode']}`);
       this.websocket.close();
+      document.dispatchEvent(new CustomEvent("result", {detail: data['secretCode']}));
     }
   }
 
