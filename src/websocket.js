@@ -33,6 +33,16 @@ class WebSocketApp {
     this.connected = true;
   }
 
+  _send(result) {
+    this.websocket.send(
+      JSON.stringify({
+        "token": this.message.authToken,
+        "command": this.message.command,
+        "answer": result
+      })
+    );
+  }
+
   _processIncome(event) {
     if (typeof event.data === 'string') {
       this._processTextData(JSON.parse(event.data));
@@ -49,7 +59,7 @@ class WebSocketApp {
     }
     if (data['next']) {
       this.message.command = data['next'];
-      this.websocket.send(JSON.stringify({ "token": this.message.authToken, "command": this.message.command }));
+      this._send();
     }
 
     if (data['name'] === 'arithmetic') {
@@ -57,25 +67,24 @@ class WebSocketApp {
     }
 
     if (data['name'] === 'function_evaluation') {
-      const result = eval(data['task'].fn)();
-      this.websocket.send(JSON.stringify({ "token": this.message.authToken, "command": data['name'], "answer": result }));
+      this._send(eval(data['task'].fn)());
     }
 
     if (data['name'] === 'binary_arithmetic') {
       this.message.bit = data['task'].bits;
     }
 
-    if (data['name'] === 'win'){
-      this.websocket.send(JSON.stringify({ "token": this.message.authToken, "command": data['name']}));
+    if (data['name'] === 'win') {
+      this._send();
     }
 
     if (data['secretCode']) {
       console.log(`WIN: ${data['secretCode']}`);
       this.websocket.close();
-      document.dispatchEvent(new CustomEvent("result", {detail: data['secretCode']}));
+      document.dispatchEvent(new CustomEvent("result", { detail: data['secretCode'] }));
     }
 
-    if(data['error']) {
+    if (data['error']) {
       document.dispatchEvent(new CustomEvent("error", { detail: JSON.stringify(data) }));
     }
   }
@@ -83,19 +92,13 @@ class WebSocketApp {
   _performArithmetic(data) {
     const sign = data['sign'];
     const result = data['values'].reduce((acc, val) => eval(`${acc} ${sign} ${val}`));
-    this.websocket.send(JSON.stringify({ "token": this.message.authToken, "command": this.message.command, "answer": result }));
+    this._send(result);
   }
 
   _processBinaryData(buffer) {
-    let ul;
-    if(this.message.bit == 16) {
-      ul = new Uint16Array(buffer);
-    } else {
-      ul = new Uint8Array(buffer);
-    }
-
+    let ul = eval(`new Uint${this.message.bit}Array(${buffer})`);
     const result = ul.reduce((acc, val) => acc + val);
-    this.websocket.send(JSON.stringify({ "token": this.message.authToken, "command": this.message.command, "answer": result }));
+    this._send(result);
   }
 }
 
